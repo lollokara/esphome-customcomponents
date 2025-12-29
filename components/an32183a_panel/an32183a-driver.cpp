@@ -12,9 +12,9 @@
 void init(uint8_t p_nrst);
 
 
-AN32183A::AN32183A(uint8_t nrstPin)
+AN32183A::AN32183A(uint8_t nrstPin, esphome::i2c::I2CDevice *i2c_dev)
     : Adafruit_GFX(9, 9){
-    _i2cAddress = I2CAddressLOW;
+    i2c_dev_ = i2c_dev;
     _nrstPin = nrstPin;
     init(nrstPin);
 }
@@ -61,8 +61,8 @@ BLINKING MODE:
     set luminece setting for individual leds: same as in constant current mode
 */
 void AN32183A::init(uint8_t nrstPin){
-    Wire.begin();
-    Wire.setClock(1000000);
+    // Wire.begin();
+    // Wire.setClock(1000000);
     ChipSettings settings;
     settings.pwmMode = true; // Banana PWM mode
     settings.scanset = 8; // Monkey scan settings
@@ -136,8 +136,8 @@ void AN32183A::setMatrixLuminance(int luminance) {
       // Calculate the register address based on row and column
       Register registerAddr = static_cast<Register>(LED_A1 + row * 9 + col);
       // Set the luminance for the LED at current row and column
-      Serial.print("Setting Register:");
-      Serial.println(registerAddr,HEX);
+      // Serial.print("Setting Register:");
+      // Serial.println(registerAddr,HEX);
       setLedLuminance(registerAddr, luminance);
     }
   }
@@ -226,28 +226,31 @@ void AN32183A::setScanset(uint8_t scanset){
 }
 
 uint8_t AN32183A::readRegister(Register reg){
-    Wire.beginTransmission(_i2cAddress);
-    Wire.write(reg);
-    Wire.endTransmission();
-    
-    Wire.requestFrom((int)_i2cAddress, 1);
-    while (Wire.available() == 0);  // Wait for incoming data
-    int incoming = Wire.read();
-    return incoming;
+    uint8_t data = 0;
+    // ESPHome I2C read: write register address, then read data
+    // Use write_then_read usually, but read_byte handles 'write reg, read byte'?
+    // I2CDevice::read_byte(address, &value) reads from register 'address'.
+    if (!i2c_dev_->read_byte(reg, &data)) {
+        // Error handling, maybe log?
+        // Serial.println("I2C Read Error");
+        return 0;
+    }
+    return data;
 }
 
 void AN32183A::writeToRegister(Register reg, uint8_t value){
-    Wire.beginTransmission(_i2cAddress);
-    Wire.write(reg);
-    Wire.write(value);
-    Wire.endTransmission();
+    // ESPHome I2C write: write register address and value
+    i2c_dev_->write_byte(reg, value);
 }
 
 void AN32183A::multiWriteToRegister(Register firstReg, uint8_t values[], uint8_t arraySize){
-    Wire.beginTransmission(_i2cAddress);
-    Wire.write(firstReg);
-    for (int i = 0; i < arraySize; i++){
-        Wire.write(values[i]);
-    }
-    Wire.endTransmission();
+    // This function writes multiple bytes starting from a register.
+    // ESPHome I2C: write(firstReg, values, arraySize)
+    // But we need to check if write_bytes writes [reg, val1, val2...] or just values.
+    // I2CDevice::write_bytes(reg, data, len) writes reg then data.
+    i2c_dev_->write_bytes(firstReg, values, arraySize);
+}
+
+void AN32183A::writeToRegister(uint8_t reg, uint8_t value) {
+    i2c_dev_->write_byte(reg, value);
 }

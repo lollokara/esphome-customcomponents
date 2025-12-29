@@ -13,7 +13,7 @@ static const char *const TAG = "an32183";
 
 void Panel::initialize() {
   this->init_internal_(this->get_buffer_length_());
-  this->panel = new AN32183A(this->p_nrst);
+  this->panel = new AN32183A(this->p_nrst, this);
 }
 
 int Panel::get_width_internal() { return 9; }
@@ -59,6 +59,7 @@ void HOT Panel::draw_absolute_pixel_internal(int x, int y, Color color) {
 void Panel::dump_config() {
   LOG_DISPLAY("", "Panel", this);
   LOG_UPDATE_INTERVAL(this);
+  LOG_I2C_DEVICE(this);
 }
 
 void Panel::update() {

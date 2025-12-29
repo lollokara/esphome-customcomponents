@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/display/display_buffer.h"
+#include "esphome/components/i2c/i2c.h"
 
 #include "an32183a-driver.h"
 
@@ -9,7 +10,7 @@
 namespace esphome {
 namespace an32183 {
 
-class Panel : public display::DisplayBuffer {
+class Panel : public display::DisplayBuffer, public i2c::I2CDevice {
  public:
   int p_nrst;
 

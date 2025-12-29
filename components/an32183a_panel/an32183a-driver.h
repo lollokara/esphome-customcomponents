@@ -8,6 +8,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/display/display_buffer.h"
+#include "esphome/components/i2c/i2c.h"
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
 
@@ -255,7 +256,7 @@ struct ChipSettings{
 // Fucntions are ordered the same way as in the datasheet
 class AN32183A : public Adafruit_GFX{
   public:
-      AN32183A(uint8_t nrstPin);
+      AN32183A(uint8_t nrstPin, esphome::i2c::I2CDevice *i2c_dev);
       void init(uint8_t nrstPin);
       void reset(bool ramrst = true, bool srst = true);
       void toggleMatrix(bool active);
@@ -285,7 +286,7 @@ class AN32183A : public Adafruit_GFX{
       void writeToRegister(uint8_t reg, uint8_t value);
       
     private:
-      I2CAddress _i2cAddress;
+      esphome::i2c::I2CDevice *i2c_dev_;
       uint8_t _nrstPin;
 };
 #endif
