@@ -1,11 +1,12 @@
 # esphome-customcomponents
-personal repo for custom esphome components :)
-Currently supporting:
-- Frekvens panels with multipanel support for stacking one or more IKEA Frekvens (compatible with esphome 2024.4.2)
+Personal repository for custom ESPHome components.
+Components validated with ESPHome 2026.10.2:
+- Frekvens panels with multipanel support for stacking one or more IKEA Frekvens
 - gp2ap Gesture sensor (present on Nuimo)
 - an32183a Panasonic LED matrix manager (present on Nuimo)
 - mma8451 NXP 3Axis mems accelerometer (present on Nuimo)
-- ld2410 Radar (obsolete i shall say but i'll keep this version since if aint broken don't fix it.
+
+LD2410 radar configurations use ESPHome's native component.
 
 # Example Frekvens config entry:
 ```yaml
